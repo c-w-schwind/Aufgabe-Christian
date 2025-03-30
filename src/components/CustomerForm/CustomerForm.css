@@ -2,33 +2,65 @@
     max-width: 500px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .form-field {
     margin-bottom: 15px;
+    text-align: left;
 }
 
 .form-label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    text-align: start;
 }
 
 .form-input {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.checkbox-group {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}
+
+.checkbox-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    font-weight: normal;
+    flex: 1;
+    text-align: left;
+    margin-right: 10px;
 }
 
 .submit-button-container {
-    padding-top: 20px;
-    text-align: end;
+    margin-top: 20px;
+    text-align: right;
 }
 
 .submit-button {
@@ -38,6 +70,7 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .submit-button:hover {
