@@ -32,7 +32,11 @@ const CheckboxGroup: FC<CheckboxGroupProps> = ({formData, setFormData}) => {
     return (
         <div className="checkbox-group">
             <div className="master-checkbox-container">
-                <label htmlFor="masterCheckbox" className="checkbox-label">{allSelected ? "Deselect all" : "Select all"}</label>
+                <label
+                    htmlFor="masterCheckbox"
+                    onClick={(e) => e.preventDefault()}
+                    className="checkbox-label"
+                >{allSelected ? "Deselect all" : "Select all"}</label>
                 <input
                     type="checkbox"
                     id="masterCheckbox"
@@ -45,7 +49,11 @@ const CheckboxGroup: FC<CheckboxGroupProps> = ({formData, setFormData}) => {
             <div className="checkbox-list">
                 {formData.checkboxes.map(checkbox => (
                     <div key={checkbox.id} className="checkbox-item">
-                        <label htmlFor={checkbox.id} className="checkbox-label">{checkbox.label}</label>
+                        <label
+                            htmlFor={checkbox.id}
+                            className="checkbox-label"
+                            onClick={(e) => e.preventDefault()}
+                        >{checkbox.label}</label>
                         <input
                             type="checkbox"
                             id={checkbox.id}
