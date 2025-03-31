@@ -42,12 +42,31 @@ const CustomerForm: React.FC = () => {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        console.log("Submitted data: ", formData);
-        setFormData({
-            numberInput: null,
-            textInput: "",
-            checkboxes: [...initialCheckboxOptions]
-        });
+        if (window.confirm("Are you sure you want to submit?")) {
+            console.log("Submitted data: ", formData);
+            setFormData({
+                numberInput: null,
+                textInput: "",
+                checkboxes: [...initialCheckboxOptions]
+            });
+        }
+    };
+
+    const handleShowData = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        console.log("Current form data:", formData);
+
+        const selectedOptions = formData.checkboxes
+            .filter(option => option.checked)
+            .map(option => `- ${option.label}`)
+            .join('\n');
+
+        const message = `Your current form inputs are:\n
+Number: ${formData.numberInput ?? "Not provided"}
+Text: ${formData.textInput || "Not provided"}
+Selected Options:
+${selectedOptions || "- None selected"}`;
+        alert(message);
     };
 
 
@@ -77,10 +96,14 @@ const CustomerForm: React.FC = () => {
                 />
             </div>
 
-            <CheckboxGroup formData={formData} setFormData={setFormData}/>
+            <div className="form-field">
+                <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
+                <CheckboxGroup formData={formData} setFormData={setFormData}/>
+            </div>
 
-            <div className="submit-button-container">
-                <button type="submit" className="submit-button">Submit</button>
+            <div className="button-container">
+                <button type="button" className="secondary" onClick={handleShowData}>Show Data</button>
+                <button type="submit" className="primary">Submit</button>
             </div>
         </form>
     );
