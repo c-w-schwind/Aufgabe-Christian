@@ -1,5 +1,6 @@
 import "./CustomerForm.css";
 import React, {ChangeEvent, FormEvent, useState} from "react";
+import CheckboxGroup from "./CheckboxGroup";
 
 
 interface CheckboxOption {
@@ -14,7 +15,7 @@ const initialCheckboxOptions: CheckboxOption[] = [
     {id: "option3", label: "Third Option", checked: false},
 ];
 
-interface FormData {
+export interface CustomerFormData {
     numberInput: number | null;
     textInput: string;
     checkboxes: CheckboxOption[];
@@ -22,27 +23,20 @@ interface FormData {
 
 
 const CustomerForm: React.FC = () => {
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState<CustomerFormData>({
         numberInput: null,
         textInput: "",
         checkboxes: [...initialCheckboxOptions]
     });
 
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === "numberInput" ? Number(value) : value
-        }));
-    };
-
-    const handleCheckboxChange = (id: string) => {
-        setFormData(prev => ({
-            ...prev,
-            checkboxes: prev.checkboxes.map(option =>
-                option.id === id ? {...option, checked: !option.checked} : option
-            )
+            [name]: name === "numberInput"
+                ? value === "" ? null : Number(value)
+                : value
         }));
     };
 
@@ -67,7 +61,7 @@ const CustomerForm: React.FC = () => {
                     name="numberInput"
                     className="form-input"
                     value={formData.numberInput === null ? "" : formData.numberInput}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                 />
             </div>
 
@@ -79,25 +73,11 @@ const CustomerForm: React.FC = () => {
                     name="textInput"
                     className="form-input"
                     value={formData.textInput}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                 />
             </div>
 
-            <div className="checkbox-group">
-                {formData.checkboxes.map(checkbox => (
-                    <div key={checkbox.id} className="checkbox-item">
-                        <label htmlFor={checkbox.id} className="checkbox-label">{checkbox.label}</label>
-                        <input
-                            type="checkbox"
-                            id={checkbox.id}
-                            name={checkbox.id}
-                            className="checkbox-input"
-                            checked={checkbox.checked}
-                            onChange={() => handleCheckboxChange(checkbox.id)}
-                        />
-                    </div>
-                ))}
-            </div>
+            <CheckboxGroup formData={formData} setFormData={setFormData}/>
 
             <div className="submit-button-container">
                 <button type="submit" className="submit-button">Submit</button>

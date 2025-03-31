@@ -32,32 +32,6 @@
     outline: none;
 }
 
-.checkbox-group {
-    margin-top: 20px;
-    text-align: left;
-}
-
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 0 10px;
-}
-
-.checkbox-input {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.checkbox-label {
-    font-weight: normal;
-    flex: 1;
-    text-align: left;
-    margin-right: 10px;
-}
-
 .submit-button-container {
     margin-top: 20px;
     text-align: right;
