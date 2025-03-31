@@ -5,10 +5,12 @@ import {CustomerFormData} from "./CustomerForm";
 interface CheckboxGroupProps {
     formData: CustomerFormData;
     setFormData: Dispatch<React.SetStateAction<CustomerFormData>>;
+    setErrors: Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }
 
-const CheckboxGroup: FC<CheckboxGroupProps> = ({formData, setFormData}) => {
+const CheckboxGroup: FC<CheckboxGroupProps> = ({formData, setFormData, setErrors}) => {
     const toggleMasterCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
+        setErrors(prev => ({...prev, checkboxes: ""}));
         const isChecked = e.target.checked;
         setFormData(prev => ({
             ...prev,
@@ -19,6 +21,7 @@ const CheckboxGroup: FC<CheckboxGroupProps> = ({formData, setFormData}) => {
     };
 
     const toggleCheckbox = (id: string) => {
+        setErrors(prev => ({...prev, checkboxes: ""}));
         setFormData(prev => ({
             ...prev,
             checkboxes: prev.checkboxes.map(option =>

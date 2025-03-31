@@ -23,6 +23,7 @@ export interface CustomerFormData {
 
 
 const CustomerForm: React.FC = () => {
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [formData, setFormData] = useState<CustomerFormData>({
         numberInput: null,
         textInput: "",
@@ -32,6 +33,7 @@ const CustomerForm: React.FC = () => {
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
+        setErrors(prev => ({...prev, [name]: ""}));
         setFormData(prev => ({
             ...prev,
             [name]: name === "numberInput"
@@ -40,9 +42,31 @@ const CustomerForm: React.FC = () => {
         }));
     };
 
+    const validateForm = (): boolean => {
+        setErrors({});
+        const collectedErrors: { [key: string]: string } = {};
+
+        if (!formData.textInput.trim()) {
+            collectedErrors.textInput = "You must provide some text.";
+        }
+
+        if (formData.numberInput === null) {
+            collectedErrors.numberInput = "You must provide a number.";
+        } else if (isNaN(formData.numberInput)) {
+            collectedErrors.numberInput = "Please provide a valid number.";
+        }
+
+        if (formData.checkboxes.filter(option => option.checked).length === 0) {
+            collectedErrors.checkboxes = "At least one option must be selected.";
+        }
+
+        setTimeout(() => setErrors(collectedErrors), 50); // Force re-rendering of error messages, drawing user attention
+        return Object.keys(collectedErrors).length === 0;
+    };
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (window.confirm("Are you sure you want to submit?")) {
+        if (validateForm() && window.confirm("Are you sure you want to submit?")) {
             console.log("Submitted data: ", formData);
             setFormData({
                 numberInput: null,
@@ -73,7 +97,10 @@ ${selectedOptions || "- None selected"}`;
     return (
         <form onSubmit={handleSubmit} className="customer-form">
             <div className="form-field">
-                <label htmlFor="numberInput" className="form-label">Your Number</label>
+                <div className="field-header">
+                    <label htmlFor="numberInput" className="form-label">Your Number</label>
+                    {errors.numberInput && <div className="error-message">{errors.numberInput}</div>}
+                </div>
                 <input
                     type="number"
                     id="numberInput"
@@ -85,7 +112,10 @@ ${selectedOptions || "- None selected"}`;
             </div>
 
             <div className="form-field">
-                <label htmlFor="textInput" className="form-label">Your Text</label>
+                <div className="field-header">
+                    <label htmlFor="textInput" className="form-label">Your Text</label>
+                    {errors.textInput && <div className="error-message">{errors.textInput}</div>}
+                </div>
                 <input
                     type="text"
                     id="textInput"
@@ -97,8 +127,15 @@ ${selectedOptions || "- None selected"}`;
             </div>
 
             <div className="form-field">
-                <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
-                <CheckboxGroup formData={formData} setFormData={setFormData}/>
+                <div className="field-header">
+                    <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
+                    {errors.checkboxes && <div className="error-message">{errors.checkboxes}</div>}
+                </div>
+                <CheckboxGroup
+                    formData={formData}
+                    setFormData={setFormData}
+                    setErrors={setErrors}
+                />
             </div>
 
             <div className="button-container">
