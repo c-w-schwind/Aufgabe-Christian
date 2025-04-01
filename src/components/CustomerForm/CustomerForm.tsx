@@ -23,7 +23,9 @@ export interface CustomerFormData {
 
 
 const CustomerForm: React.FC = () => {
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+    const [submissionError, setSubmissionError] = useState<string>("");
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [formData, setFormData] = useState<CustomerFormData>({
         numberInput: null,
         textInput: "",
@@ -33,7 +35,7 @@ const CustomerForm: React.FC = () => {
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setErrors(prev => ({...prev, [name]: ""}));
+        setFormErrors(prev => ({...prev, [name]: ""}));
         setFormData(prev => ({
             ...prev,
             [name]: name === "numberInput"
@@ -43,7 +45,7 @@ const CustomerForm: React.FC = () => {
     };
 
     const validateForm = (): boolean => {
-        setErrors({});
+        setFormErrors({});
         const collectedErrors: { [key: string]: string } = {};
 
         if (!formData.textInput.trim()) {
@@ -60,19 +62,62 @@ const CustomerForm: React.FC = () => {
             collectedErrors.checkboxes = "At least one option must be selected.";
         }
 
-        setTimeout(() => setErrors(collectedErrors), 50); // Force re-rendering of error messages, drawing user attention
+        setTimeout(() => setFormErrors(collectedErrors), 50); // Force re-rendering of error messages, drawing user attention
         return Object.keys(collectedErrors).length === 0;
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setSubmissionError("");
         if (validateForm() && window.confirm("Are you sure you want to submit?")) {
-            console.log("Submitted data: ", formData);
-            setFormData({
-                numberInput: null,
-                textInput: "",
-                checkboxes: [...initialCheckboxOptions]
-            });
+            setIsSubmitting(true);
+            try {
+                const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+                    method: "POST",
+                    headers: {
+                        //"Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Content-type": "application/json; charset=UTF-8"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    if (response.status === 401) {
+                        throw new Error("Unauthorized: Your session might have expired. Please log in again.");
+                    } else if (response.status === 500) {
+                        throw new Error("Server Error: There was a problem on our end. Please try again later.");
+                    } else {
+                        throw new Error(errorText || `Failed to submit data: Received status ${response.status}.`);
+                    }
+                }
+
+                const data = await response.json();
+                console.log("Submit successful:", data);
+                setFormData({
+                    numberInput: null,
+                    textInput: "",
+                    checkboxes: [...initialCheckboxOptions]
+                });
+            } catch (err: unknown) {
+                let errorMessage = "Error: There was a problem submitting your data. Please try again.";
+                if (err instanceof Error) {
+                    console.error("Fetch operation failed:", err.message);
+                    if (err.message.includes("Unauthorized")) {
+                        errorMessage = "Unauthorized: Your session might have expired. Please log in again.";
+                    } else if (err.message.includes("Server Error")) {
+                        errorMessage = "Server Error: There was a problem on our end. Please try again later.";
+                    } else if (err.message.includes("Failed to fetch")) {
+                        errorMessage =
+                            "Network Error: Could not connect to the server. Check your internet connection and try again.";
+                    }
+                } else {
+                    console.error("Unknown error type:", err);
+                }
+                setSubmissionError(errorMessage);
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -83,7 +128,7 @@ const CustomerForm: React.FC = () => {
         const selectedOptions = formData.checkboxes
             .filter(option => option.checked)
             .map(option => `- ${option.label}`)
-            .join('\n');
+            .join("\n");
 
         const message = `Your current form inputs are:\n
 Number: ${formData.numberInput ?? "Not provided"}
@@ -99,7 +144,7 @@ ${selectedOptions || "- None selected"}`;
             <div className="form-field">
                 <div className="field-header">
                     <label htmlFor="numberInput" className="form-label">Your Number</label>
-                    {errors.numberInput && <div className="error-message">{errors.numberInput}</div>}
+                    {formErrors.numberInput && <div className="error-message">{formErrors.numberInput}</div>}
                 </div>
                 <input
                     type="number"
@@ -114,7 +159,7 @@ ${selectedOptions || "- None selected"}`;
             <div className="form-field">
                 <div className="field-header">
                     <label htmlFor="textInput" className="form-label">Your Text</label>
-                    {errors.textInput && <div className="error-message">{errors.textInput}</div>}
+                    {formErrors.textInput && <div className="error-message">{formErrors.textInput}</div>}
                 </div>
                 <input
                     type="text"
@@ -129,19 +174,21 @@ ${selectedOptions || "- None selected"}`;
             <div className="form-field">
                 <div className="field-header">
                     <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
-                    {errors.checkboxes && <div className="error-message">{errors.checkboxes}</div>}
+                    {formErrors.checkboxes && <div className="error-message">{formErrors.checkboxes}</div>}
                 </div>
                 <CheckboxGroup
                     formData={formData}
                     setFormData={setFormData}
-                    setErrors={setErrors}
+                    setErrors={setFormErrors}
                 />
             </div>
 
             <div className="button-container">
                 <button type="button" className="secondary" onClick={handleShowData}>Show Data</button>
-                <button type="submit" className="primary">Submit</button>
+                <button type="submit" className="primary" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit"}</button>
             </div>
+
+            {submissionError && (<div className="submission-error">{submissionError}</div>)}
         </form>
     );
 };
