@@ -1,6 +1,7 @@
 import "./CustomerForm.css";
 import React, {ChangeEvent, FormEvent, useState} from "react";
 import CheckboxGroup from "./CheckboxGroup";
+import LoadingOverlay from "../CommonComponents/LoadingOverlay";
 
 
 interface CheckboxOption {
@@ -140,56 +141,60 @@ ${selectedOptions || "- None selected"}`;
 
 
     return (
-        <form onSubmit={handleSubmit} className="customer-form">
-            <div className="form-field">
-                <div className="field-header">
-                    <label htmlFor="numberInput" className="form-label">Your Number</label>
-                    {formErrors.numberInput && <div className="error-message">{formErrors.numberInput}</div>}
+        <>
+            <form onSubmit={handleSubmit} className="customer-form">
+                <div className="form-field">
+                    <div className="field-header">
+                        <label htmlFor="numberInput" className="form-label">Your Number</label>
+                        {formErrors.numberInput && <div className="error-message">{formErrors.numberInput}</div>}
+                    </div>
+                    <input
+                        type="number"
+                        id="numberInput"
+                        name="numberInput"
+                        className="form-input"
+                        value={formData.numberInput === null ? "" : formData.numberInput}
+                        onChange={handleInputChange}
+                    />
                 </div>
-                <input
-                    type="number"
-                    id="numberInput"
-                    name="numberInput"
-                    className="form-input"
-                    value={formData.numberInput === null ? "" : formData.numberInput}
-                    onChange={handleInputChange}
-                />
-            </div>
 
-            <div className="form-field">
-                <div className="field-header">
-                    <label htmlFor="textInput" className="form-label">Your Text</label>
-                    {formErrors.textInput && <div className="error-message">{formErrors.textInput}</div>}
+                <div className="form-field">
+                    <div className="field-header">
+                        <label htmlFor="textInput" className="form-label">Your Text</label>
+                        {formErrors.textInput && <div className="error-message">{formErrors.textInput}</div>}
+                    </div>
+                    <input
+                        type="text"
+                        id="textInput"
+                        name="textInput"
+                        className="form-input"
+                        value={formData.textInput}
+                        onChange={handleInputChange}
+                    />
                 </div>
-                <input
-                    type="text"
-                    id="textInput"
-                    name="textInput"
-                    className="form-input"
-                    value={formData.textInput}
-                    onChange={handleInputChange}
-                />
-            </div>
 
-            <div className="form-field">
-                <div className="field-header">
-                    <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
-                    {formErrors.checkboxes && <div className="error-message">{formErrors.checkboxes}</div>}
+                <div className="form-field">
+                    <div className="field-header">
+                        <label htmlFor="checkboxOptions" className="form-label">Your Options</label>
+                        {formErrors.checkboxes && <div className="error-message">{formErrors.checkboxes}</div>}
+                    </div>
+                    <CheckboxGroup
+                        formData={formData}
+                        setFormData={setFormData}
+                        setErrors={setFormErrors}
+                    />
                 </div>
-                <CheckboxGroup
-                    formData={formData}
-                    setFormData={setFormData}
-                    setErrors={setFormErrors}
-                />
-            </div>
 
-            <div className="button-container">
-                <button type="button" className="secondary" onClick={handleShowData}>Show Data</button>
-                <button type="submit" className="primary" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit"}</button>
-            </div>
+                <div className="button-container">
+                    <button type="button" className="secondary" onClick={handleShowData}>Show Data</button>
+                    <button type="submit" className="primary" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit"}</button>
+                </div>
 
-            {submissionError && (<div className="submission-error">{submissionError}</div>)}
-        </form>
+                {submissionError && (<div className="submission-error">{submissionError}</div>)}
+            </form>
+
+            <LoadingOverlay isVisible={isSubmitting} message={"Submitting your data..."}/>
+        </>
     );
 };
 

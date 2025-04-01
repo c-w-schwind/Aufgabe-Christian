@@ -1,0 +1,62 @@
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out; /* Fade-out */ /* Warning: Transition time matched by effect in LoadingOverlay.js */
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out; /* Fade-in */
+}
+
+.loading-overlay:focus {
+    outline: none;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(0deg, rgb(68, 74, 89), rgb(59, 64, 82));
+    border: 3px solid grey;
+    width: 450px;
+    padding: 50px 30px;
+    border-radius: 19px;
+    box-sizing: border-box;
+    box-shadow: 0 0 29px 15px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #a4c1ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loading-message {
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-align: center;
+    white-space: pre-wrap;
+    padding: 0 15px;
+    margin-top: 20px;
+    line-height: 1.9;
+}
+
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
